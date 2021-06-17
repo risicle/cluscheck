@@ -5,11 +5,43 @@ import numba as nb
 import numpy as np
 
 
+@nb.jit(nopython=True)
+def dimension_selector_uniform(n_dimensions):
+    return random.randrange(n_dimensions)
+
+
+def get_dimension_selector_expovariate(
+    lambd=None,
+    rel_lambd=None,
+):
+    if lambd is not None and rel_lambd is not None:
+        raise ValueError("Cannot set both lambd and rel_lambd")
+
+    if lambd is None and rel_lambd is None:
+        # the default, using a rel_lambd of 4.0, placing the pseudo-mean
+        # 1/4 of the way into the dimensions
+        rel_lambd = 4.
+
+    @nb.jit(nopython=True)
+    def dimension_selector_expovariate(n_dimensions):
+        nonlocal lambd, rel_lambd
+
+        value = math.inf
+        while value >= n_dimensions:
+            value = random.expovariate(
+                lambd if lambd is not None else rel_lambd/n_dimensions
+            )
+        return int(value)
+
+    return dimension_selector_expovariate
+
+
 def get_finder_for_cluster_obeying(
     check_func,
     min_count=1,
     max_count=-1,
     max_depth=-1,
+    dimension_selector=dimension_selector_uniform,
     debug=False,
 ):
     @nb.jit(nopython=True)
@@ -18,7 +50,7 @@ def get_finder_for_cluster_obeying(
         non_dimensional_parameters,
         random_seed=0,
     ):
-        nonlocal check_func, min_count, max_count, max_depth
+        nonlocal check_func, min_count, max_count, max_depth, debug
 
         if dimensional_parameters.shape[-1] != non_dimensional_parameters.shape[-1]:
             raise ValueError(
@@ -46,7 +78,7 @@ def get_finder_for_cluster_obeying(
 
         while True:
             if right_branch_stack[current_level] == 0:
-                chosen_dimension = random.randrange(dimensional_parameters.shape[0])
+                chosen_dimension = dimension_selector(dimensional_parameters.shape[0])
                 chosen_dimension_vals = \
                     dimensional_parameters[chosen_dimension,...][bitmap_stack[current_level-1,:]]
 
