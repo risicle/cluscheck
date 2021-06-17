@@ -10,6 +10,7 @@ def get_finder_for_cluster_obeying(
     min_count=1,
     max_count=-1,
     max_depth=-1,
+    debug=False,
 ):
     @nb.jit(nopython=True)
     def _find_cluster_obeying(
@@ -72,7 +73,10 @@ def get_finder_for_cluster_obeying(
 
             bitmap = bitmap_stack[current_level,:]
             remaining_count = np.sum(bitmap)
-            print("current_level = ", current_level, " remaining_count = ", remaining_count)
+
+            if debug:
+                print("current_level = ", current_level, " remaining_count = ", remaining_count)
+
             if remaining_count < min_count:
                 right_branch_stack[current_level]+=1
                 continue
