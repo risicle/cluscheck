@@ -99,8 +99,11 @@ def get_finder_for_cluster_obeying(
                 bitmap_stack[current_level,:] = False
                 if current_level > 1:
                     current_level-=1
+                    # advance branch at underlying level
+                    right_branch_stack[current_level]+=1
                 # else we're at the root, start again by continuing at the
                 # same current_level
+
                 continue
 
             bitmap = bitmap_stack[current_level,:]
