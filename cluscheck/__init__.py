@@ -49,6 +49,7 @@ def get_finder_for_cluster_obeying(
         dimensional_parameters,
         non_dimensional_parameters,
         random_seed=0,
+        iterations=-1,
     ):
         nonlocal check_func, min_count, max_count, max_depth, debug
 
@@ -75,6 +76,7 @@ def get_finder_for_cluster_obeying(
         right_branch_stack = np.zeros((final_max_depth,), dtype=np.int8)
 
         current_level = 1
+        iteration = 0
 
         while True:
             if right_branch_stack[current_level] == 0:
@@ -101,8 +103,14 @@ def get_finder_for_cluster_obeying(
                     current_level-=1
                     # advance branch at underlying level
                     right_branch_stack[current_level]+=1
-                # else we're at the root, start again by continuing at the
-                # same current_level
+                else:
+                    # we're at the root
+                    iteration+=1
+                    if iterations != -1 and iteration >= iterations:
+                        return None
+
+                    # start again by continuing at the
+                    # same current_level
 
                 continue
 
