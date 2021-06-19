@@ -42,6 +42,9 @@ def get_finder_for_cluster_obeying(
     max_count=-1,
     max_depth=-1,
     dimension_selector=dimension_selector_uniform,
+    fixed_dimensional_parameters=-1,
+    fixed_non_dimensional_parameters=-1,
+    fixed_n=-1,
     verbose=False,
 ):
     @nb.jit(nopython=True)
@@ -56,6 +59,24 @@ def get_finder_for_cluster_obeying(
                 "Minor dimension of dimensional_parameters and "
                 "non_dimensional_parameters must match"
             )
+
+        if (
+            fixed_dimensional_parameters != -1
+            and fixed_dimensional_parameters != dimensional_parameters.shape[0]
+        ):
+            raise ValueError("Number of dimensional parameters not expected value")
+
+        if (
+            fixed_non_dimensional_parameters != -1
+            and fixed_non_dimensional_parameters != non_dimensional_parameters.shape[0]
+        ):
+            raise ValueError("Number of non-dimensional parameters not expected value")
+
+        if (
+            fixed_n != -1
+            and fixed_n != non_dimensional_parameters.shape[-1]
+        ):
+            raise ValueError("Number of candidates not expected value")
 
         final_max_depth = max_depth if max_depth != -1 else (1 + int(
             math.floor(math.log(dimensional_parameters.shape[-1]) / math.log(2))

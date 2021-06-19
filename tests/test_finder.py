@@ -16,12 +16,18 @@ import cluscheck
     (2, 1, 1, operator.ge,),
     (5, 2, 2, operator.ge,),
 ))
+@pytest.mark.parametrize("fixed_dp", (False, True))
+@pytest.mark.parametrize("fixed_ndp", (False, True))
+@pytest.mark.parametrize("fixed_n", (False, True))
 def test_all_checked(
     random_seed,
     max_count,
     iterations,
     expected_checks,
     expected_checks_cmp,
+    fixed_dp,
+    fixed_ndp,
+    fixed_n,
 ):
     rs = np.random.RandomState(random_seed)
     dp = rs.uniform(-1,1,(64,1000))
@@ -49,6 +55,9 @@ def test_all_checked(
         max_count=max_count,
         # ridiculous depth should make it unlikely we miss any
         max_depth=100,
+        fixed_dimensional_parameters=dp.shape[0] if fixed_dp else -1,
+        fixed_non_dimensional_parameters=ndp.shape[0] if fixed_ndp else -1,
+        fixed_n=dp.shape[1] if fixed_n else -1,
     )
 
     finder(dp, ndp, random_seed=random_seed, iterations=iterations)
@@ -101,3 +110,26 @@ def test_abort_branch(random_seed):
             # any clusters with odd numbers should have been aborted after
             # their first check call
             assert v == 1
+
+
+@pytest.mark.parametrize("fixed_kw", (
+    "fixed_dimensional_parameters",
+    "fixed_non_dimensional_parameters",
+    "fixed_n",
+))
+def test_wrong_fixed_size(fixed_kw):
+    dp = np.zeros((64,100))
+    ndp = np.zeros((2,100), dtype="int8")
+
+    @nb.jit(nopython=True)
+    def check(ndp_):
+        return 0
+
+    finder = cluscheck.get_finder_for_cluster_obeying(
+        check,
+        min_count=1,
+        max_count=10,
+        **{fixed_kw: 123},
+    )
+    with pytest.raises(ValueError):
+        finder(dp, ndp, iterations=1)
