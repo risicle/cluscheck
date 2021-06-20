@@ -51,8 +51,6 @@ def get_finder_for_cluster_obeying(
         random_seed=0,
         iterations=-1,
     ):
-        nonlocal check_func, min_count, max_count, max_depth, debug
-
         if dimensional_parameters.shape[-1] != non_dimensional_parameters.shape[-1]:
             raise ValueError(
                 "Minor dimension of dimensional_parameters and "
