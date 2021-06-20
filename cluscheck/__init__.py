@@ -123,11 +123,15 @@ def get_finder_for_cluster_obeying(
                 right_branch_stack[current_level]+=1
                 continue
 
-            if (
-                (max_count == -1 or remaining_count <= max_count)
-                and check_func(non_dimensional_parameters[...,bitmap])
-            ):
-                return bitmap
+            if max_count == -1 or remaining_count <= max_count:
+                check_result = check_func(non_dimensional_parameters[...,bitmap])
+                if check_result:
+                    if check_result > 0:
+                        return bitmap
+                    else:
+                        # negative result signals to stop checking this branch
+                        right_branch_stack[current_level]+=1
+                        continue
 
             if remaining_count <= 1:
                 # dividing any more makes no sense
