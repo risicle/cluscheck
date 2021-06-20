@@ -48,7 +48,7 @@ def get_finder_for_cluster_obeying(
     def _find_cluster_obeying(
         dimensional_parameters,
         non_dimensional_parameters,
-        random_seed=0,
+        random_seed=None,
         iterations=-1,
     ):
         if dimensional_parameters.shape[-1] != non_dimensional_parameters.shape[-1]:
@@ -64,7 +64,8 @@ def get_finder_for_cluster_obeying(
         if final_max_depth < 2:
             raise ValueError("max_depth < 2 makes no sense")
 
-        random.seed(random_seed)
+        if random_seed is not None:
+            random.seed(random_seed)
 
         bitmap_stack = np.zeros(
             (final_max_depth, dimensional_parameters.shape[-1]),
