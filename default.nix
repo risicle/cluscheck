@@ -13,6 +13,9 @@
       python.pkgs.pytest
     ] ++ pkgs.stdenv.lib.optionals forDev [
       python.pkgs.ipython
+      python.pkgs.r2pipe
+      python.pkgs.graphviz
+      pkgs.less
     ];
   };
 }
