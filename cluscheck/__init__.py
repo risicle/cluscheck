@@ -91,9 +91,9 @@ def get_finder_for_cluster_obeying(
                     (chosen_dimension_vals >= chosen_split_point)
             elif right_branch_stack[current_level] == 1:
                 # invert current_level's bitmap, masked by the previous level's
-                bitmap_stack[current_level,:][bitmap_stack[current_level-1,:]] = np.logical_not(
-                    bitmap_stack[current_level,:][bitmap_stack[current_level-1,:]]
-                )
+                for i in range(bitmap_stack.shape[1]):
+                    if bitmap_stack[current_level-1,i]:
+                        bitmap_stack[current_level,i] = not bitmap_stack[current_level,i]
             else:
                 # tidy up then unwind
                 right_branch_stack[current_level] = 0
