@@ -80,15 +80,31 @@ def get_finder_for_cluster_obeying(
         while True:
             if right_branch_stack[current_level] == 0:
                 chosen_dimension = dimension_selector(dimensional_parameters.shape[0])
-                chosen_dimension_vals = \
-                    dimensional_parameters[chosen_dimension,...][bitmap_stack[current_level-1,:]]
+                vals_count = 0
+                # initialize these to any value of the correct type
+                vals_min = vals_max = dimensional_parameters[0,0]
+                # scan for range of remaining values in this dimension
+                for i in range(dimensional_parameters.shape[1]):
+                    if bitmap_stack[current_level-1,i]:
+                        v = dimensional_parameters[chosen_dimension,i]
 
-                chosen_split_point = random.uniform(
-                    np.min(chosen_dimension_vals),
-                    np.max(chosen_dimension_vals),
-                )
-                bitmap_stack[current_level,:][bitmap_stack[current_level-1,:]] = \
-                    (chosen_dimension_vals >= chosen_split_point)
+                        if vals_count == 0:
+                            vals_min = vals_max = v
+                        else:
+                            vals_min = min(vals_min, v)
+                            vals_max = max(vals_max, v)
+
+                        vals_count+=1
+
+                chosen_split_point = random.uniform(vals_min, vals_max)
+
+                # mark values greater than threshold
+                for i in range(dimensional_parameters.shape[1]):
+                    if bitmap_stack[current_level-1,i]:
+                        is_chosen = (
+                            dimensional_parameters[chosen_dimension,i] >= chosen_split_point
+                        )
+                        bitmap_stack[current_level,i] = is_chosen
             elif right_branch_stack[current_level] == 1:
                 # invert current_level's bitmap, masked by the previous level's
                 for i in range(bitmap_stack.shape[1]):
