@@ -99,17 +99,24 @@ def get_finder_for_cluster_obeying(
                 chosen_split_point = random.uniform(vals_min, vals_max)
 
                 # mark values greater than threshold
+                remaining_count = 0
                 for i in range(dimensional_parameters.shape[1]):
                     if bitmap_stack[current_level-1,i]:
                         is_chosen = (
                             dimensional_parameters[chosen_dimension,i] >= chosen_split_point
                         )
                         bitmap_stack[current_level,i] = is_chosen
+                        if is_chosen:
+                            remaining_count+=1
             elif right_branch_stack[current_level] == 1:
                 # invert current_level's bitmap, masked by the previous level's
+                remaining_count = 0
                 for i in range(bitmap_stack.shape[1]):
                     if bitmap_stack[current_level-1,i]:
-                        bitmap_stack[current_level,i] = not bitmap_stack[current_level,i]
+                        is_chosen = not bitmap_stack[current_level,i]
+                        bitmap_stack[current_level,i] = is_chosen
+                        if is_chosen:
+                            remaining_count+=1
             else:
                 # tidy up then unwind
                 right_branch_stack[current_level] = 0
@@ -130,7 +137,6 @@ def get_finder_for_cluster_obeying(
                 continue
 
             bitmap = bitmap_stack[current_level,:]
-            remaining_count = np.sum(bitmap)
 
             if verbose:
                 print("current_level = ", current_level, " remaining_count = ", remaining_count)
