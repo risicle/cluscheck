@@ -9,7 +9,7 @@ import numba as nb
 import cluscheck
 
 
-@pytest.mark.parametrize("random_seed", (0,1,2))
+@pytest.mark.parametrize("random_seed", tuple(range(5)))
 @pytest.mark.parametrize("max_count,iterations,expected_checks,expected_checks_cmp", (
     (1, 1, 1, operator.eq,),
     (1, 2, 2, operator.eq,),
@@ -59,7 +59,7 @@ def test_all_checked(
         assert expected_checks_cmp(checked_items[k], ref_counter[k])
 
 
-@pytest.mark.parametrize("random_seed", (0,1,2))
+@pytest.mark.parametrize("random_seed", tuple(range(5)))
 def test_abort_branch(random_seed):
     rs = np.random.RandomState(random_seed)
     dp = rs.uniform(-1,1,(64,1000))
