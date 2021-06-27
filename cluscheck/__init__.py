@@ -165,11 +165,22 @@ def get_finder_for_cluster_obeying(
                 continue
 
             if max_count == -1 or remaining_count <= max_count:
-                bitmap = bitmap_stack[current_level,:]
-                check_result = check_func(non_dimensional_parameters[...,bitmap])
+                ndp_subset = np.empty(
+                    (non_dimensional_parameters.shape[0], remaining_count,),
+                    dtype=non_dimensional_parameters.dtype,
+                )
+
+                j = 0
+                for i in range(bitmap_stack.shape[1]):
+                    if j < remaining_count and bitmap_stack[current_level,i]:
+                        for k in range(ndp_subset.shape[0]):
+                            ndp_subset[k,j] = non_dimensional_parameters[k,i]
+                        j+=1
+
+                check_result = check_func(ndp_subset)
                 if check_result:
                     if check_result > 0:
-                        return bitmap
+                        return bitmap_stack[current_level,:]
                     else:
                         # negative result signals to stop checking this branch
                         right_branch_stack[current_level]+=1
