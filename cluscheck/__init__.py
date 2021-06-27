@@ -157,8 +157,6 @@ def get_finder_for_cluster_obeying(
 
                 continue
 
-            bitmap = bitmap_stack[current_level,:]
-
             if verbose:
                 print("current_level = ", current_level, " remaining_count = ", remaining_count)
 
@@ -167,6 +165,7 @@ def get_finder_for_cluster_obeying(
                 continue
 
             if max_count == -1 or remaining_count <= max_count:
+                bitmap = bitmap_stack[current_level,:]
                 check_result = check_func(non_dimensional_parameters[...,bitmap])
                 if check_result:
                     if check_result > 0:
