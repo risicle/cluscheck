@@ -54,10 +54,10 @@ def get_finder_for_cluster_obeying(
         random_seed=None,
         iterations=-1,
     ):
-        if dimensional_parameters.shape[-1] != non_dimensional_parameters.shape[-1]:
+        if dimensional_parameters.shape[1] != non_dimensional_parameters.shape[0]:
             raise ValueError(
-                "Minor dimension of dimensional_parameters and "
-                "non_dimensional_parameters must match"
+                "Minor dimension of dimensional_parameters must match "
+                "major dimension of non_dimensional_parameters"
             )
 
         if (
@@ -68,13 +68,13 @@ def get_finder_for_cluster_obeying(
 
         if (
             fixed_non_dimensional_parameters != -1
-            and fixed_non_dimensional_parameters != non_dimensional_parameters.shape[0]
+            and fixed_non_dimensional_parameters != non_dimensional_parameters.shape[1]
         ):
             raise ValueError("Number of non-dimensional parameters not expected value")
 
         if (
             fixed_n != -1
-            and fixed_n != non_dimensional_parameters.shape[-1]
+            and fixed_n != non_dimensional_parameters.shape[0]
         ):
             raise ValueError("Number of candidates not expected value")
 
@@ -166,15 +166,15 @@ def get_finder_for_cluster_obeying(
 
             if max_count == -1 or remaining_count <= max_count:
                 ndp_subset = np.empty(
-                    (non_dimensional_parameters.shape[0], remaining_count,),
+                    (remaining_count, non_dimensional_parameters.shape[1],),
                     dtype=non_dimensional_parameters.dtype,
                 )
 
                 j = 0
                 for i in range(bitmap_stack.shape[1]):
                     if j < remaining_count and bitmap_stack[current_level,i]:
-                        for k in range(ndp_subset.shape[0]):
-                            ndp_subset[k,j] = non_dimensional_parameters[k,i]
+                        for k in range(ndp_subset.shape[1]):
+                            ndp_subset[j,k] = non_dimensional_parameters[i,k]
                         j+=1
 
                 check_result = check_func(ndp_subset)
