@@ -58,6 +58,7 @@ def test_all_checked(
         fixed_dimensional_parameters=dp.shape[0] if fixed_dp else -1,
         fixed_non_dimensional_parameters=ndp.shape[1] if fixed_ndp else -1,
         fixed_n=dp.shape[1] if fixed_n else -1,
+        jit_kwargs={"boundscheck": True},
     )
 
     finder(dp, ndp, random_seed=random_seed, iterations=iterations)
@@ -100,6 +101,7 @@ def test_abort_branch(random_seed):
         max_count=max_count,
         # ridiculous depth should make it unlikely we miss any
         max_depth=100,
+        jit_kwargs={"boundscheck": True},
     )
 
     finder(dp, ndp, random_seed=random_seed, iterations=1)
@@ -129,6 +131,7 @@ def test_wrong_fixed_size(fixed_kw):
         check,
         min_count=1,
         max_count=10,
+        jit_kwargs={"boundscheck": True},
         **{fixed_kw: 123},
     )
     with pytest.raises(ValueError):

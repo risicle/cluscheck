@@ -46,8 +46,9 @@ def get_finder_for_cluster_obeying(
     fixed_non_dimensional_parameters=-1,
     fixed_n=-1,
     verbose=False,
+    jit_kwargs={},
 ):
-    @nb.jit(nopython=True)
+    @nb.jit(nopython=True, **jit_kwargs)
     def _find_cluster_obeying(
         dimensional_parameters,
         non_dimensional_parameters,
